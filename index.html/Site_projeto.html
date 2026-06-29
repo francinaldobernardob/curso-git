@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora ProObra - V2</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800">
+
+    <header class="bg-blue-600 text-white p-4 shadow-md">
+        <div class="container mx-auto text-center">
+            <h1 class="text-2xl font-bold">🛠️ Calculadora ProObra (Versão 2.0)</h1>
+            <p class="text-sm opacity-90">O assistente digital do seu canteiro de obras</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 max-w-4xl">
+        
+        <section class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Selecione sua Função atual:</label>
+            <select id="roleSelector" onchange="switchRole()" class="w-full p-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                <option value="pedreiro">🧱 Pedreiro / Mestre de Obras</option>
+                <option value="carpinteria_ferreiro">⛓️ Carpinteiro / Ferreiro (Armador)</option>
+                <option value="eletricista_bombeiro">⚡ Eletricista / Bombeiro Hidráulico</option>
+            </select>
+        </section>
+
+        <div id="tab-pedreiro" class="tab-content active space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <h2 class="text-xl font-semibold text-blue-600 mb-4">📐 Geometria Básica (Metragens)</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-500">Comprimento (m)</label>
+                        <input type="number" id="geoComp" value="1" step="0.1" class="w-full p-2 border rounded mt-1">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-500">Largura / Altura (m)</label>
+                        <input type="number" id="geoLarg" value="1" step="0.1" class="w-full p-2 border rounded mt-1">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-500">Espessura / Profundidade (m)</label>
+                        <input type="number" id="geoEsp" value="0.1" step="0.01" class="w-full p-2 border rounded mt-1">
+                    </div>
+                </div>
+                <button onclick="calcularGeometria()" class="mt-4 w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 font-bold">Calcular Metragens</button>
+                
+                <div id="resGeometria" class="mt-4 grid grid-cols-3 gap-2 text-center text-sm font-semibold text-gray-700 hidden">
+                    <div class="bg-gray-100 p-2 rounded">Linear: <span id="resLinear" class="text-blue-600">0</span>m</div>
+                    <div class="bg-gray-100 p-2 rounded">Área: <span id="resQuadrado" class="text-blue-600">0</span>m²</div>
+                    <div class="bg-gray-100 p-2 rounded">Volume: <span id="resCubico" class="text-blue-600">0</span>m³</div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <h2 class="text-xl font-semibold text-blue-600 mb-4">🥣 Calculadora de Traço (Materiais)</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-500">Tipo de Serviço</label>
+                        <select id="tipoTraco" class="w-full p-2 border rounded mt-1">
+                            <option value="chapisco">Chapisco (1:3)</option>
+                            <option value="reboco">Reboco (1:6)</option>
+                            <option value="alvenaria">Alvenaria/Assentamento (1:5)</option>
+                            <option value="piso">Piso / Contra-piso (1:4)</option>
+                            <option value="concreto">Concreto Estrutural (1:2:3)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-500">Volume Necessário (m³)</label>
+                        <input type="number" id="volumeNecessario" value="1" step="0.1" class="w-full p-2 border rounded mt-1">
+                    </div>
+                </div>
+                <button onclick="calcularMateriais()" class="mt-4 w-full bg-green-600 text-white p-2 rounded hover:bg-green-700 font-bold">Calcular Insumos</button>
+
+                <div id="resMateriais" class="mt-4 p-4 bg-green-50 rounded-lg border border-green-200 hidden">
+                    <h3 class="font-bold text-green-800 mb-2">Materiais Estimados (Com 10% de perda inclusa):</h3>
+                    <ul class="space-y-1 text-sm text-gray-700">
+                        <li>🔸 Cimento: <span id="matCimento" class="font-bold text-gray-900">0</span> sacos (50kg)</li>
+                        <li>🔸 Areia: <span id="matAreia" class="font-bold text-gray-900">0</span> m³ (<span id="matAreiaLatas" class="font-bold text-gray-900">0</span> latas de 18L)</li>
+                        <li id="linhaBrita" class="hidden">🔸 Brita: <span id="matBrita" class="font-bold text-gray-900">0</span> m³ (<span id="matBritaLatas" class="font-bold text-gray-900">0</span> latas de 18L)</li>
+                        <li>🔸 Água: Estimado <span id="matAgua" class="font-bold text-gray-900">0</span> Litros</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-carpinteria_ferreiro" class="tab-content space-y-6">
+            
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <h2 class="text-xl font-semibold text-orange-600 mb-4">⛓️ Dimensionamento e Peso do Aço (NBR 7480)</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-500">Selecione a Bitola (Pol / mm)</label>
+                        <select id="acoBitola" class="w-full p-2 border rounded mt-1 bg-white">
+                            <option value="4.2">4.2 mm (CA-60)</option>
+                            <option value="5.0">5.0 mm (3/16" - CA-60)</option>
+                            <option value="6.3">6.3 mm (1/4" - CA-50)</option>
+                            <option value="8.0">8.0 mm (5/16" - CA-50)</option>
+                            <option value="10.0" selected>10.0 mm (3/8" - CA-50)</option>
+                            <option value="12.5">12.5 mm (1/2" - CA-50)</option>
+                            <option value="16.0">16.0 mm (5/8" - CA-50)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-500">Quantidade de Barras</label>
+                        <input type="number" id="acoQtdBarras" value="4" min="1" class="w-full p-2 border rounded mt-1">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-500">Tamanho da Barra (m)</label>
+                        <input type="number" id="acoTamBarra" value="12" min="1" class="w-full p-2 border rounded mt-1">
+                    </div>
+                </div>
+
+                <button onclick="calcularPesoCargaAco()" class="w-full bg-orange-600 text-white p-2 rounded hover:bg-orange-700 font-bold">Calcular Peso e Carga Suportada</button>
+
+                <div id="resAco" class="mt-4 p-4 bg-orange-50 rounded-lg border border-orange-200 hidden">
+                    <h3 class="font-bold text-orange-900 mb-3">Resultado dos Cálculos de Armação:</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div class="space-y-1 text-gray-700">
+                            <p>⚖️ <strong>Peso Total do Lote:</strong> <span id="resPesoTotal" class="font-bold text-gray-900">0</span> kg</p>
+                            <p>📏 Metragem linear total: <span id="resMetroTotal" class="font-bold">0</span> metros</p>
+                        </div>
+                        <div class="p-3 bg-white rounded border border-orange-200">
+                            <p class="text-xs text-gray-500 uppercase font-bold">💪 Capacidade de Carga Técnica (Tração de Escoamento Seguro):</p>
+                            <p class="text-xl font-bold text-red-600 mt-1"><span id="resCargaUnitaria">0</span> kgf <span class="text-xs font-normal text-gray-600">(Por Barra)</span></p>
+                            <p class="text-sm font-semibold text-gray-700 mt-1">Total do conjunto: <span id="resCargaTotal" class="text-red-700 font-bold">0</span> kgf</p>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-3 italic">⚠️ Nota: Os valores de carga consideram tração axial pura sob limite de escoamento de norma com coeficiente de segurança estático. O dimensionamento final de colunas/vigas depende do cálculo estrutural completo (flexo-compressão/flambagem).</p>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <h2 class="text-xl font-semibold text-orange-600 mb-2">⛓️ Estimador rápido de Estribos</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-500">Comprimento Total da Viga/Coluna (m)</label>
+                        <input type="number" id="ferroComp" value="4" class="w-full p-2 border rounded mt-1">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-500">Espaçamento dos Estribos (cm)</label>
+                        <input type="number" id="ferroEstribo" value="15" class="w-full p-2 border rounded mt-1">
+                    </div>
+                </div>
+                <button onclick="calcularFerragem()" class="mt-4 w-full bg-gray-700 text-white p-2 rounded hover:bg-gray-800 font-bold">Calcular Estribos</button>
+                <div id="resFerragem" class="mt-4 p-3 bg-gray-100 rounded text-center font-semibold hidden">
+                    Quantidade estimada de estribos: <span id="qtdEstribos" class="text-orange-600">0</span> unidades.
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-eletricista_bombeiro" class="tab-content space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <h2 class="text-xl font-semibold text-purple-600 mb-4">⚡ Instalações e Infraestrutura</h2>
+                <div class="space-y-4">
+                    <div class="border-l-4 border-purple-500 bg-purple-50 p-3">
+                        <h3 class="font-bold text-purple-900">🌊 Hidráulica & Esgoto</h3>
+                        <p class="text-sm text-gray-700 mt-1">Lembrete de caimento padrão: <strong>1% de inclinação</strong> para tubos de esgoto até 100mm (1cm de queda a cada 1 metro linear).</p>
+                    </div>
+                    <div class="border-l-4 border-yellow-500 bg-yellow-50 p-3">
+                        <h3 class="font-bold text-yellow-900">🔌 Elétrica (Ocupação de Eletrodutos)</h3>
+                        <p class="text-sm text-gray-700 mt-1">Por norma (NBR 5410), a taxa máxima de ocupação interna dos conduítes não deve passar de <strong>40%</strong> da sua área útil para 3 ou mais cabos.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="text-center p-6 text-xs text-gray-500">
+        Desenvolvido em parceria com a Equipe Dev ProObra © 2026.
+    </footer>
+
+    <script>
+        // Banco de Dados Técnico das Bitolas (NBR 7480)
+        // pesoMetro = kg/m
+        // fyk = limite de escoamento em kgf/mm² (CA-50 = 50, CA-60 = 60)
+        // segurancaFator = Coeficiente normativo simplificado de segurança (1.15)
+        const tabelaAco = {
+            "4.2":  { pesoMetro: 0.109, areaMm2: 13.9,  tipo: "CA-60", fyk: 60 },
+            "5.0":  { pesoMetro: 0.154, areaMm2: 19.6,  tipo: "CA-60", fyk: 60 },
+            "6.3":  { pesoMetro: 0.245, areaMm2: 31.2,  tipo: "CA-50", fyk: 50 },
+            "8.0":  { pesoMetro: 0.395, areaMm2: 50.3,  tipo: "CA-50", fyk: 50 },
+            "10.0": { pesoMetro: 0.617, areaMm2: 78.5,  tipo: "CA-50", fyk: 50 },
+            "12.5": { pesoMetro: 0.963, areaMm2: 122.7, tipo: "CA-50", fyk: 50 },
+            "16.0": { pesoMetro: 1.578, areaMm2: 201.1, tipo: "CA-50", fyk: 50 }
+        };
+
+        function switchRole() {
+            const role = document.getElementById('roleSelector').value;
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            if (role === 'pedreiro') document.getElementById('tab-pedreiro').classList.add('active');
+            else if (role === 'carpinteria_ferreiro') document.getElementById('tab-carpinteria_ferreiro').classList.add('active');
+            else if (role === 'eletricista_bombeiro') document.getElementById('tab-eletricista_bombeiro').classList.add('active');
+        }
+
+        // NOVO ALGORITMO: Peso e Carga Suportada
+        function calcularPesoCargaAco() {
+            const bitolaSel = document.getElementById('acoBitola').value;
+            const qtdBarras = parseInt(document.getElementById('acoQtdBarras').value) || 0;
+            const tamBarra = parseFloat(document.getElementById('acoTamBarra').value) || 0;
+
+            if (qtdBarras <= 0 || tamBarra <= 0) {
+                alert("Por favor, insira valores válidos para quantidade e tamanho das barras.");
+                return;
+            }
+
+            const dadosAco = tabelaAco[bitolaSel];
+            const metrosTotais = qtdBarras * tamBarra;
+            const pesoTotal = metrosTotais * dadosAco.pesoMetro;
+
+            // Cálculo da carga de tração admissível/segura
+            // Formula: (Área da Seção em mm² * Limite Escoamento) / Fator de segurança (1.15)
+            const cargaSeguraUnitaria = (dadosAco.areaMm2 * dadosAco.fyk) / 1.15;
+            const cargaSeguraTotal = cargaSeguraUnitaria * qtdBarras;
+
+            // Renderiza na tela
+            document.getElementById('resMetroTotal').innerText = metrosTotais.toFixed(1);
+            document.getElementById('resPesoTotal').innerText = pesoTotal.toFixed(2);
+            document.getElementById('resCargaUnitaria').innerText = Math.floor(cargaSeguraUnitaria).toLocaleString('pt-BR');
+            document.getElementById('resCargaTotal').innerText = Math.floor(cargaSeguraTotal).toLocaleString('pt-BR');
+
+            document.getElementById('resAco').classList.remove('hidden');
+        }
+
+        // Funções da V1 mantidas
+        function calcularGeometria() {
+            const comp = parseFloat(document.getElementById('geoComp').value) || 0;
+            const larg = parseFloat(document.getElementById('geoLarg').value) || 0;
+            const textEsp = parseFloat(document.getElementById('geoEsp').value) || 0;
+            document.getElementById('resLinear').innerText = comp.toFixed(2);
+            document.getElementById('resQuadrado').innerText = (comp * larg).toFixed(2);
+            const cubico = comp * larg * textEsp;
+            document.getElementById('resCubico').innerText = cubico.toFixed(2);
+            document.getElementById('volumeNecessario').value = cubico.toFixed(2);
+            document.getElementById('resGeometria').classList.remove('hidden');
+        }
+
+        function calcularMateriais() {
+            const tipo = document.getElementById('tipoTraco').value;
+            const volume = parseFloat(document.getElementById('volumeNecessario').value) || 0;
+            if (volume <= 0) return alert('Insira um volume válido.');
+            const volComPerda = volume * 1.10;
+            let cimentoSacos = 0, areiaM3 = 0, britaM3 = 0, aguaLitros = 0;
+            
+            if (tipo === 'concreto') document.getElementById('linhaBrita').classList.remove('hidden');
+            else document.getElementById('linhaBrita').classList.add('hidden');
+
+            switch (tipo) {
+                case 'chapisco': cimentoSacos = volComPerda * 7; areiaM3 = volComPerda * 1.05; aguaLitros = cimentoSacos * 30; break;
+                case 'reboco': cimentoSacos = volComPerda * 4.5; areiaM3 = volComPerda * 1.15; aguaLitros = cimentoSacos * 28; break;
+                case 'alvenaria': cimentoSacos = volComPerda * 5; areiaM3 = volComPerda * 1.1; aguaLitros = cimentoSacos * 30; break;
+                case 'piso': cimentoSacos = volComPerda * 6; areiaM3 = volComPerda * 1.1; aguaLitros = cimentoSacos * 25; break;
+                case 'concreto': cimentoSacos = volComPerda * 7; areiaM3 = volComPerda * 0.6; britaM3 = volComPerda * 0.8; aguaLitros = cimentoSacos * 20; break;
+            }
+            const latasPorM3 = 55.55;
+            document.getElementById('matCimento').innerText = Math.ceil(cimentoSacos);
+            document.getElementById('matAreia').innerText = areiaM3.toFixed(2);
+            document.getElementById('matAreiaLatas').innerText = Math.ceil(areiaM3 * latasPorM3);
+            if (tipo === 'concreto') {
+                document.getElementById('matBrita').innerText = britaM3.toFixed(2);
+                document.getElementById('matBritaLatas').innerText = Math.ceil(britaM3 * latasPorM3);
+            }
+            document.getElementById('matAgua').innerText = Math.ceil(aguaLitros);
+            document.getElementById('resMateriais').classList.remove('hidden');
+        }
+
+        function calcularFerragem() {
+            const comp = parseFloat(document.getElementById('ferroComp').value) || 0;
+            const espacamentoCm = parseFloat(document.getElementById('ferroEstribo').value) || 15;
+            if (comp > 0 && espacamentoCm > 0) {
+                const estribos = Math.ceil(comp / (espacamentoCm / 100)) + 1;
+                document.getElementById('qtdEstribos').innerText = estribos;
+                document.getElementById('resFerragem').classList.remove('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
